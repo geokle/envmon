@@ -1,0 +1,59 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install packages
+  apt:
+    pkg:
+    - docker
+    - docker-compose
+    - nginx
+    state: latest
+
+- name: Enable and start services
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  loop:
+    - docker
+    - nginx
+
+- name: Creates directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/prometheus
+    - /etc/alertmanager
+    - /etc/docker-compose
+    - /etc/grafana
+    - /etc/grafana/dashboards
+    - /etc/grafana/provisioning
+    - /etc/grafana/provisioning/datasources
+    - /etc/grafana/provisioning/dashboards
+
+- name: Copying files
+  copy: 
+    src: "{{ item.file }}"
+    dest: /etc/{{ item.folder }}/{{ item.file }}
+  with_items:
+    - { file: docker-compose.yml, folder: docker-compose }
+    - { file: config.monitoring, folder: docker-compose }
+    - { file: prometheus.yml, folder: prometheus }
+    - { file: alert.rules, folder: prometheus }
+    - { file: config.yml, folder: alertmanager }
+    - { file: http-ping.json, folder: grafana/dashboards }
+    - { file: system-monitor.json, folder: grafana/dashboards }
+    - { file: all_dashboards.yml, folder: grafana/provisioning/dashboards }
+    - { file: all.yml, folder: grafana/provisioning/datasources }
+
+- name: Start Docker-compose
+  docker_compose:
+    project_src: /etc/docker-compose
+    state: present
+
+
+
+
