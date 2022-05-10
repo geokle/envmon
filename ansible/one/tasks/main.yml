@@ -27,13 +27,31 @@
   loop:
     - /etc/prometheus
     - /etc/alertmanager
+    - /etc/blackboxexporter
     - /etc/docker-compose
     - /etc/grafana
     - /etc/grafana/dashboards
     - /etc/grafana/provisioning
     - /etc/grafana/provisioning/datasources
     - /etc/grafana/provisioning/dashboards
+    - /etc/loki
+    - /etc/promtail
 
+- name: Creates for loki data
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+  loop:
+    - /data
+    - /wal
+
+- name: Enable the plugin
+  community.docker.docker_plugin:
+    plugin_name: grafana/loki-docker-driver:latest
+    alias: loki
+    state: enable
+    
 - name: Copying files
   copy: 
     src: "{{ item.file }}"
@@ -44,7 +62,10 @@
     - { file: prometheus.yml, folder: prometheus }
     - { file: alert.rules, folder: prometheus }
     - { file: config.yml, folder: alertmanager }
+    - { file: config_black.yml, folder: blackboxexporter }
     - { file: http-ping.json, folder: grafana/dashboards }
+    - { file: loki-config.yml, folder: loki }
+    - { file: config_promtail.yml, folder: promtail }
     - { file: system-monitor.json, folder: grafana/dashboards }
     - { file: all_dashboards.yml, folder: grafana/provisioning/dashboards }
     - { file: all.yml, folder: grafana/provisioning/datasources }
