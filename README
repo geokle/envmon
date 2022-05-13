@@ -1,2 +1,21 @@
+Install docker-compose and Grafana/Prometheus/AlertManager/Loki + node-exporter/cadvisor
+
+Only Ubuntu 20.04/LTS
+
+1. Set hosts and users with root permissions in inventory/hosts.ini
+2. Run ansible playbook
 cd ansible
 ansible-playbook main.yml -i inventory
+3. Tests 
+#cd tests
+#py.test -v test_myinfra.py
+
+
+
+Info
+grafana http://hostip:3000
+User admin
+Pass ***
+You can check grafana password and change it in config.monitoring file before install
+
+
