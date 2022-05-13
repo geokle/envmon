@@ -6,10 +6,13 @@ volumes:
 
 services:
   prometheus:
-    image: prom/prometheus:master
+    image: prom/prometheus:v2.33.5
+    user: root
+    privileged: true
     volumes:
       - /etc/prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
+      - /var/run/docker.sock:/var/run/docker.sock
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -32,6 +35,14 @@ services:
         max-buffer-size: 4m
         loki-retries: "3"
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   node-exporter:
     image: prom/node-exporter:master
@@ -56,6 +67,14 @@ services:
         max-buffer-size: 4m
         loki-retries: "3"
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   alertmanager:
     image: prom/alertmanager:v0.12.0
@@ -76,6 +95,14 @@ services:
         max-buffer-size: 4m
         loki-retries: "3"
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   cadvisor:
     image: google/cadvisor
@@ -99,6 +126,14 @@ services:
     devices:
       - /dev/kmsg:/dev/kmsg
     privileged: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   grafana:
     image: grafana/grafana:master
@@ -122,6 +157,14 @@ services:
         max-buffer-size: 4m
         loki-retries: "3"
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   loki:
     image: grafana/loki:latest
@@ -132,7 +175,22 @@ services:
     command: -config.file=/etc/loki/loki-config.yml
     ports:
         - "3100:3100"
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        mode: non-blocking
+        max-buffer-size: 4m
+        loki-retries: "3"
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M
 
   promtail:
     image: grafana/promtail:2.5.0
@@ -141,16 +199,19 @@ services:
     volumes:
       - /var/log:/var/log
       - /etc/promtail/:/etc/promtail/
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        mode: non-blocking
+        max-buffer-size: 4m
+        loki-retries: "3"
     command: -config.file=/etc/promtail/config_promtail.yml
-
-  blackbox_exporter:
-    image: prom/blackbox-exporter:v0.10.0
-    ports:
-      - 9115:9115
-    links:
-      - loki:loki
-    volumes:
-      - /etc/blackboxexporter/:/etc/blackboxexporter/
-    command:
-      - '--config.file=/etc/blackboxexporter/config_black.yml'
-    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.001'
+          memory: 100M
+        reservations:
+          cpus: '0.0001'
+          memory: 80M

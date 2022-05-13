@@ -27,7 +27,6 @@
   loop:
     - /etc/prometheus
     - /etc/alertmanager
-    - /etc/blackboxexporter
     - /etc/docker-compose
     - /etc/grafana
     - /etc/grafana/dashboards
@@ -62,11 +61,10 @@
     - { file: prometheus.yml, folder: prometheus }
     - { file: alert.rules, folder: prometheus }
     - { file: config.yml, folder: alertmanager }
-    - { file: config_black.yml, folder: blackboxexporter }
-    - { file: http-ping.json, folder: grafana/dashboards }
     - { file: loki-config.yml, folder: loki }
     - { file: config_promtail.yml, folder: promtail }
-    - { file: system-monitor.json, folder: grafana/dashboards }
+    - { file: prometheus.json, folder: grafana/dashboards }
+    - { file: loki.json, folder: grafana/dashboards }
     - { file: all_dashboards.yml, folder: grafana/provisioning/dashboards }
     - { file: all.yml, folder: grafana/provisioning/datasources }
 

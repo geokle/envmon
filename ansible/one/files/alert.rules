@@ -1,5 +1,5 @@
 groups:
-- name: example
+- name: envmon
   rules:
 
   - alert: service_down
