@@ -7,8 +7,8 @@ Only Ubuntu 20.04/LTS
 cd ansible
 ansible-playbook main.yml -i inventory
 3. Tests 
-#cd tests
-#py.test -v test_myinfra.py
+cd tests
+py.test -v test_myinfra.py
 
 
 
