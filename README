@@ -3,11 +3,11 @@ Install docker-compose and Grafana/Prometheus/AlertManager/Loki + node-exporter/
 Only Ubuntu 20.04/LTS
 
 1. Set hosts and users with root permissions in inventory/hosts.ini
-2. Run ansible playbook
+2. Ansible run playbook
 cd ansible
 pip3 install -r requirements.txt
 ansible-playbook main.yml -i inventory
-3. Tests 
+3. Tests run
 cd tests
 pip3 install -r requirements.txt
 pytest --connection=ansible --hosts='ansible://ubuntu' --ansible-inventory=../ansible/inventory test_myinfra.py
